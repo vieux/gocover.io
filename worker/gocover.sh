@@ -1,6 +1,6 @@
 #!/bin/bash
 
-go get -d $1 2> /dev/null
+go get -d -t $1 2> /dev/null
 
 if [ $? -gt 0 ]; then
     echo "Cannot get '$1'" >&2
