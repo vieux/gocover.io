@@ -1,0 +1,75 @@
+    <div class="container text-center margin40" id="loading">
+            <div id="loader" class="row padtop40">
+                <h2 id="step">initializing...</h2>
+                <div class="progress progress-striped active">
+                    <div id="bar" class="progress-bar progress-bar-info" style="width: 0%"></div>
+                </div>
+		{{if .cache}}
+                <h6><a href="#" onclick="getCache();">view cached copy</a></h6>
+		{{end}}
+            </div>
+    </div><!-- /.container -->
+    <iframe id="frame" frameborder="0" style="visibility:hidden;"></iframe>
+    <script>
+        var step = document.getElementById('step');
+	var loading = document.getElementById('loading');
+	var frame = document.getElementById('frame');
+
+        setTimeout(function() {step.innerHTML='spawning <a href="http://docker.io">docker</a> container...';$("#bar").css('width',25+'%')}, 500);
+        setTimeout(function() {step.innerHTML='fetching the <a href="http://{{.repo}}">repository</a>...';$("#bar").css('width',50+'%')}, 1500);
+        setTimeout(function() {step.innerHTML='running the tests...';$("#bar").css('width',75+'%')}, 4000);
+	function getFresh() {
+		 getCover("_")
+	}  
+	function getCache() {
+		 getCover("_cache")
+	}  
+	function getCover(prefix) {
+	
+	$.ajax({
+		type: "GET",
+		url: "/"+prefix+"/{{.repo}}",
+      		error: function(data){
+		       document.getElementById('gocover_error').style.display = "block";
+		       document.getElementById('gocover_error_message').innerHTML = data.responseText;
+ 		       loading.parentNode.removeChild(loading);
+      		},
+		success: function(data){
+                	 $('#frame').contents().find('body').html(data);
+			 var frame = document.getElementById('frame');
+			 frame.style.visibility="visible";
+
+			 var files = frame.contentDocument.getElementById('files');
+                	 var visible = frame.contentDocument.getElementById('file0');
+                	 files.addEventListener('change', function onChange() {
+	                 visible.style.display = 'none';	
+                    	 visible = frame.contentDocument.getElementById(files.value);
+                    	 visible.style.display = 'block';
+                    	 window.scrollTo(0, 0);
+                	 }, false);
+			 
+			 $.ajax({
+				type: "GET",
+				url: "http://go-search.org/api?action=package&id="+encodeURIComponent({{.repo}})+"&callback=search",
+    				crossDomain: true,
+				dataType: 'jsonp'
+			});
+			loading.parentNode.removeChild(loading);
+            	}
+	});
+	}
+	function search(code, data) {
+		 if (data.Imports && data.Imports.length  > 0) {
+		    var dependencies = document.getElementById('dependencies');
+	  	    $.each(data.Imports, function(i, repo){
+		    		    var dep = document.createElement("li");
+                    		    dependencies.appendChild(dep);
+                    		    dep.innerHTML = '<a href="/'+repo+'">'+repo+'</a>';
+		    });
+
+       		    var menu = document.getElementById('menu-toggle');
+                    menu.style.visibility = 'visible';
+		 }
+	}
+	window.onload = getFresh;
+    </script>

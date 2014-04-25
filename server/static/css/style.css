@@ -1,0 +1,24 @@
+body {
+  padding-top: 60px;
+}
+
+.margin40{
+    margin-top: 40px
+}
+
+.padsides15 {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+#frame {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    padding-top: 60px;
+    bottom: 0px;
+}
+
+.progress {
+    height: 42px !important;
+}
