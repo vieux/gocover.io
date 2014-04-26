@@ -1,15 +1,14 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"html/template"
 	"log"
 	"net/http"
+	"os/exec"
 	"regexp"
 	"strings"
 
-	"github.com/dotcloud/docker/api/client"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
 
@@ -77,20 +76,15 @@ func main() {
 			return 200, string(cached)
 		}
 
-		var (
-			result = bytes.NewBuffer(nil)
-			error  = bytes.NewBuffer(nil)
-			cli    = client.NewDockerCli(nil, result, error, "unix", *socket, nil)
-		)
-
-		if err := cli.CmdRun("--rm", "-a", "stdout", "-a", "stderr", "worker", repo); err != nil {
-			return 500, error.String()
+		out, err := exec.Command("docker", "-H", "unix://"+*socket, "run", "--rm", "-a", "stdout", "-a", "stderr", "worker", repo).CombinedOutput()
+		if err != nil {
+			return 500, string(out)
 		}
 		re, err := regexp.Compile("\\<script[\\S\\s]+?\\</script\\>")
 		if err != nil {
 			return 500, err.Error()
 		}
-		content := re.ReplaceAllString(result.String(), "")
+		content := re.ReplaceAllString(string(out), "")
 		content = strings.Replace(content, "background: black;", "background: #222222;", 2)
 
 		content = strings.Replace(content, ".cov1 { color: rgb(128, 128, 128) }", ".cov1 { color: #52987D }", 2)
