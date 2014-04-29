@@ -48,6 +48,20 @@ func main() {
 		}
 		r.HTML(200, "cover", map[string]interface{}{"top": top, "last": last, "cover_active": "active"})
 	})
+	m.Get("/_score/**", func(params martini.Params) (int, string) {
+		var (
+			repo = params["_1"]
+			conn = pool.Get()
+		)
+
+		defer conn.Close()
+		if coverage, err := redis.GetCoverage(conn, repo); err != nil {
+			return 500, err.Error()
+		} else {
+			return 200, coverage
+		}
+
+	})
 	m.Get("/_cache/**", func(params martini.Params) (int, string) {
 		var (
 			repo = params["_1"]
@@ -104,7 +118,14 @@ func main() {
 			}
 			content = re.ReplaceAllString(result.String(), "\\>...$1\\</option\\>")
 		*/
-		redis.SetCache(conn, repo, content)
+
+		re = regexp.MustCompile("-- cov:([0-9.]*) --")
+		matches := re.FindStringSubmatch(content)
+		if len(matches) == 2 {
+			redis.SetCache(conn, repo, content, matches[1])
+		} else {
+			redis.SetCache(conn, repo, content, "-1")
+		}
 		redis.SetStats(conn, repo)
 		return 200, content
 	})

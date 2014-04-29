@@ -31,9 +31,10 @@ func SetStats(c redis.Conn, repo string) error {
 	return c.Flush()
 }
 
-func SetCache(c redis.Conn, repo, content string) error {
-	_, err := c.Do("SETEX", repo, CACHE_EXPIRE_TIME, content)
-	return err
+func SetCache(c redis.Conn, repo, content, coverage string) error {
+	c.Send("SETEX", repo, CACHE_EXPIRE_TIME, content)
+	c.Send("SET", repo+".coverage", coverage)
+	return c.Flush()
 }
 
 func GetRepo(c redis.Conn, repo string) (string, bool, error) {
@@ -63,4 +64,8 @@ func Top(c redis.Conn, key string, count int) ([]string, error) {
 		return nil, nil
 	}
 	return reply, err
+}
+
+func GetCoverage(c redis.Conn, repo string) (string, error) {
+	return redis.String(c.Do("GET", repo+".coverage"))
 }

@@ -9,7 +9,7 @@ fi
 
 cd $1
 
-go test -covermode=count -coverprofile=coverage.out > /dev/null
+number=`go test -covermode=count -coverprofile=coverage.out | grep coverage | cut -d ' ' -f 2 | sed 's/%//g'`
 
 if [ $? -gt 0 ]; then
     echo "Cannot test '$1'" >&2
@@ -27,3 +27,5 @@ if [ $? -gt 0 ]; then
     echo "Cannot get coverage of '$1'" >&2
     exit 4
 fi
+
+echo "<!-- cov:$number -->"
