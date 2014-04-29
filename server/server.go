@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -48,7 +49,7 @@ func main() {
 		}
 		r.HTML(200, "cover", map[string]interface{}{"top": top, "last": last, "cover_active": "active"})
 	})
-	m.Get("/_score/**", func(params martini.Params) (int, string) {
+	m.Get("/_badge/**", func(params martini.Params, r render.Render) {
 		var (
 			repo = params["_1"]
 			conn = pool.Get()
@@ -56,9 +57,15 @@ func main() {
 
 		defer conn.Close()
 		if coverage, err := redis.GetCoverage(conn, repo); err != nil {
-			return 500, err.Error()
+			r.Redirect(fmt.Sprintf("http://img.shields.io/badge/gocover.io-error-lightgrey.svg"))
+		} else if coverage < 25.0 {
+			r.Redirect(fmt.Sprintf("http://img.shields.io/badge/gocover.io-%.2f%%-red.svg", coverage))
+		} else if coverage < 50.0 {
+			r.Redirect(fmt.Sprintf("http://img.shields.io/badge/gocover.io-%.2f%%-orange.svg", coverage))
+		} else if coverage < 75.0 {
+			r.Redirect(fmt.Sprintf("http://img.shields.io/badge/gocover.io-%.2f%%-green.svg", coverage))
 		} else {
-			return 200, coverage
+			r.Redirect(fmt.Sprintf("http://img.shields.io/badge/gocover.io-%.2f%%-brightgreen.svg", coverage))
 		}
 
 	})

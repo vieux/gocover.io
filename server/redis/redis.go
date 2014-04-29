@@ -66,6 +66,6 @@ func Top(c redis.Conn, key string, count int) ([]string, error) {
 	return reply, err
 }
 
-func GetCoverage(c redis.Conn, repo string) (string, error) {
-	return redis.String(c.Do("GET", repo+".coverage"))
+func GetCoverage(c redis.Conn, repo string) (float64, error) {
+	return redis.Float64(c.Do("GET", repo+".coverage"))
 }
