@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="go cover as a service">
     <meta name="author" content="Victor Vieux">
+
+    <meta property="og:image" content="http://gocover.io/og.png" />
+
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     
@@ -42,6 +45,7 @@
 	  {{if .repo }}
             <li style="padding: 20px 0px 0px 0px">&nbsp;&nbsp;&nbsp;<a href="https://twitter.com/share" class="twitter-share-button" data-text='"{{.repo}}" code coverage:' data-hashtags="golang">Tweet</a><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script></li>
 	  {{end}}
+            <li><a href="http://status.gocover.io">Status</a></li>
             <li class="{{.about_active}}"><a href="/about">About</a></li>
           </ul>
         </div><!--/.nav-collapse -->
