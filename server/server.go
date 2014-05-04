@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os/exec"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/go-martini/martini"
@@ -26,9 +27,13 @@ func main() {
 	flag.Parse()
 
 	var (
-		pool = redis.NewPool("tcp", *redisAddr)
-		m    = martini.Classic()
+		m         = martini.Classic()
+		pool, err = redis.NewPool("tcp", *redisAddr)
 	)
+
+	if err != nil {
+		log.Fatalf("%v", err)
+	}
 
 	m.Use(martini.Static("static"))
 	m.Use(render.Renderer(render.Options{Layout: "layout"}))
@@ -59,13 +64,13 @@ func main() {
 		if coverage, err := redis.GetCoverage(conn, repo); err != nil {
 			r.Redirect(fmt.Sprintf("http://img.shields.io/badge/gocover.io-error-lightgrey.svg"))
 		} else if coverage < 25.0 {
-			r.Redirect(fmt.Sprintf("http://img.shields.io/badge/gocover.io-%.2f%%-red.svg", coverage))
+			r.Redirect(fmt.Sprintf("http://img.shields.io/badge/gocover.io-%.1f%%-red.svg", coverage))
 		} else if coverage < 50.0 {
-			r.Redirect(fmt.Sprintf("http://img.shields.io/badge/gocover.io-%.2f%%-orange.svg", coverage))
+			r.Redirect(fmt.Sprintf("http://img.shields.io/badge/gocover.io-%.1f%%-orange.svg", coverage))
 		} else if coverage < 75.0 {
-			r.Redirect(fmt.Sprintf("http://img.shields.io/badge/gocover.io-%.2f%%-green.svg", coverage))
+			r.Redirect(fmt.Sprintf("http://img.shields.io/badge/gocover.io-%.1f%%-green.svg", coverage))
 		} else {
-			r.Redirect(fmt.Sprintf("http://img.shields.io/badge/gocover.io-%.2f%%-brightgreen.svg", coverage))
+			r.Redirect(fmt.Sprintf("http://img.shields.io/badge/gocover.io-%.1f%%-brightgreen.svg", coverage))
 		}
 
 	})
@@ -129,6 +134,10 @@ func main() {
 		re = regexp.MustCompile("-- cov:([0-9.]*) --")
 		matches := re.FindStringSubmatch(content)
 		if len(matches) == 2 {
+			cov, err := strconv.ParseFloat(matches[1], 64)
+			if err == nil {
+				content = strings.Replace(content, "<select id=", fmt.Sprintf("<span class='cov%d'>%s%%</span> | <select id=", int((cov-0.0001)/10), matches[1]), 1)
+			}
 			redis.SetCache(conn, repo, content, matches[1])
 		} else {
 			redis.SetCache(conn, repo, content, "-1")

@@ -23,7 +23,7 @@
 	    	 <div class="list-group">
   		      <a class="list-group-item active">Most popular repositories</a>
   		      {{range .top}}
-  		      <a href="/{{.}}" class="list-group-item">{{.}}</a>
+		      <a href="/{{.Repo}}" class="list-group-item">{{.Repo}}<span class="badge">{{.Coverage}}</span></a>
 		      {{end}}
 		 </div>
             </div>
@@ -31,7 +31,7 @@
 	    	 <div class="list-group">
   		      <a class="list-group-item active">Last repositories covered</a>
   		      {{range .last}}
-  		      <a href="/{{.}}" class="list-group-item">{{.}}</a>
+		      <a href="/{{.Repo}}" class="list-group-item">{{.Repo}}<span class="badge">{{.Coverage}}</span></a>
 		      {{end}}
 		 </div>
             </div>
