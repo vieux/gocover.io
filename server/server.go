@@ -123,13 +123,7 @@ func main() {
 		content = strings.Replace(content, ".cov8 { color: rgb(128, 128, 128) }", ".cov8 { color: #21D994 }", 2)
 		content = strings.Replace(content, ".cov9 { color: rgb(128, 128, 128) }", ".cov9 { color: #1AE297 }", 2)
 
-		/*
-			re, err = regexp.Compile("\\>" + repo + "([\\S\\s]?)\\</option\\>")
-			if err != nil {
-				return 500, err.Error()
-			}
-			content = re.ReplaceAllString(result.String(), "\\>...$1\\</option\\>")
-		*/
+		content = strings.Replace(content, "\">"+repo, "\">", -1)
 
 		re = regexp.MustCompile("-- cov:([0-9.]*) --")
 		matches := re.FindStringSubmatch(content)
