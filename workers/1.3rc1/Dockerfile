@@ -10,7 +10,7 @@ RUN apt-get install --no-install-recommends -y  ca-certificates curl mercurial g
 # Custom libs for some projects
 RUN apt-get install libreadline-dev -y
 
-RUN curl -s https://storage.googleapis.com/golang/go1.2.2.linux-amd64.tar.gz | tar -v -C /usr/local -xz
+RUN curl -sL http://golang.org/dl/go1.3rc1.linux-amd64.tar.gz | tar -v -C /usr/local -xz
 ENV GOPATH /go
 ENV GOROOT /usr/local/go
 ENV PATH $PATH:/usr/local/go/bin:/go/bin
