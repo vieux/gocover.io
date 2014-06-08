@@ -145,7 +145,13 @@ func main() {
 			if err == nil {
 				content = strings.Replace(content, "<select id=", fmt.Sprintf("<span class='cov%d'>%s%%</span> | <select id=", int((cov-0.0001)/10), matches[1]), 1)
 			}
-			redis.SetCache(conn, repo, content, matches[1])
+			if version != "" {
+				content = strings.Replace(content, "<select id=", fmt.Sprintf("<span>%s</span> | <select id=", version), 1)
+			} else {
+				redis.SetCache(conn, repo, content, matches[1])
+			}
+		} else if version != "" {
+			content = strings.Replace(content, "<select id=", fmt.Sprintf("<span>%s</span> | <select id=", version), 1)
 		} else {
 			redis.SetCache(conn, repo, content, "-1")
 		}
