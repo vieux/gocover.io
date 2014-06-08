@@ -1,12 +1,19 @@
-FROM crosbymichael/golang
+FROM debian:jessie
+
+MAINTAINER "Victor Vieux"
 
 RUN echo "deb http://security.debian.org testing/updates main" >> /etc/sources.list
 
-RUN apt-get update
-RUN apt-get install subversion bzr build-essential --no-install-recommends -y
+RUN apt-get update -qq
+RUN apt-get install --no-install-recommends -y  ca-certificates curl mercurial git-core subversion bzr build-essential --no-install-recommends -y
 
 # Custom libs for some projects
 RUN apt-get install libreadline-dev -y
+
+RUN curl -s https://storage.googleapis.com/golang/go1.2.2.linux-amd64.tar.gz | tar -v -C /usr/local -xz
+ENV GOPATH /go
+ENV GOROOT /usr/local/go
+ENV PATH $PATH:/usr/local/go/bin:/go/bin
 
 RUN go get code.google.com/p/go.tools/cmd/cover
 
