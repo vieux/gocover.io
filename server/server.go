@@ -74,36 +74,49 @@ func main() {
 		}
 
 	})
-	m.Get("/_cache/**", func(params martini.Params) (int, string) {
+	m.Get("/_cache/**", func(req *http.Request, params martini.Params) (int, string) {
 		var (
 			repo = params["_1"]
 			conn = pool.Get()
 		)
 		defer conn.Close()
 
-		if cached, _, err := redis.GetRepo(conn, repo); err != nil {
-			return 500, err.Error()
-		} else if cached != "" {
-			redis.SetStats(conn, repo)
-			return 200, string(cached)
+		if req.FormValue("version") == "" {
+			if cached, _, err := redis.GetRepo(conn, repo); err != nil {
+				return 500, err.Error()
+			} else if cached != "" {
+				redis.SetStats(conn, repo)
+				return 200, string(cached)
+			}
 		}
 		return 404, "No cached version of " + repo
 	})
-	m.Get("/_/**", func(params martini.Params) (int, string) {
+	m.Get("/_/**", func(req *http.Request, params martini.Params) (int, string) {
 		var (
-			repo = params["_1"]
-			conn = pool.Get()
+			repo    = params["_1"]
+			conn    = pool.Get()
+			worker  = "vieux/gocover"
+			version = req.FormValue("version")
 		)
 		defer conn.Close()
 
-		if cached, fresh, err := redis.GetRepo(conn, repo); err != nil {
-			return 500, err.Error()
-		} else if fresh {
-			return 200, string(cached)
+		if version != "" {
+			worker = worker + ":" + version
 		}
 
-		out, err := exec.Command("docker", "-H", "unix://"+*socket, "run", "--rm", "-a", "stdout", "-a", "stderr", "worker", repo).CombinedOutput()
+		if version == "" {
+			if cached, fresh, err := redis.GetRepo(conn, repo); err != nil {
+				return 500, err.Error()
+			} else if fresh {
+				return 200, string(cached)
+			}
+		}
+
+		out, err := exec.Command("docker", "-H", "unix://"+*socket, "run", "--rm", "-a", "stdout", "-a", "stderr", worker, repo).CombinedOutput()
 		if err != nil {
+			if strings.Contains(string(out), "Unable to find image") {
+				return 500, "go version '" + version + "' not found"
+			}
 			return 500, string(out)
 		}
 		re, err := regexp.Compile("\\<script[\\S\\s]+?\\</script\\>")
@@ -136,23 +149,30 @@ func main() {
 		} else {
 			redis.SetCache(conn, repo, content, "-1")
 		}
-		redis.SetStats(conn, repo)
+		if version == "" {
+			redis.SetStats(conn, repo)
+		}
 		return 200, content
 	})
-	m.Get("/**", func(params martini.Params, r render.Render) {
+	m.Get("/**", func(req *http.Request, params martini.Params, r render.Render) {
 		var (
-			repo = params["_1"]
-			conn = pool.Get()
+			repo    = params["_1"]
+			conn    = pool.Get()
+			version = ""
 		)
 		defer conn.Close()
 
-		if cached, fresh, err := redis.GetRepo(conn, repo); err != nil {
+		if req.ParseForm() == nil {
+			version = req.FormValue("version")
+		}
+
+		if cached, fresh, err := redis.GetRepo(conn, repo+version); err != nil {
 			r.HTML(500, "", map[string]interface{}{"cover_active": "active", "error": err})
 		} else if fresh {
 			redis.SetStats(conn, repo)
-			r.HTML(200, "cached", map[string]interface{}{"repo": repo, "cover_active": "active", "cache": template.HTML(cached)})
+			r.HTML(200, "cached", map[string]interface{}{"repo": repo, "cover_active": "active", "cache": template.HTML(cached), "version": version})
 		} else {
-			contexts := map[string]interface{}{"repo": repo, "cover_active": "active"}
+			contexts := map[string]interface{}{"repo": repo, "cover_active": "active", "version": version}
 			if cached != "" {
 				contexts["cache"] = "ok"
 			}

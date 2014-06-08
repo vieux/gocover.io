@@ -28,7 +28,7 @@
 	
 	$.ajax({
 		type: "GET",
-		url: "/"+prefix+"/{{.repo}}",
+		url: "/"+prefix+"/{{.repo}}?version={{.version}}",
       		error: function(data){
 		       document.getElementById('gocover_error').style.display = "block";
 		       document.getElementById('gocover_error_message').innerHTML = data.responseText;
