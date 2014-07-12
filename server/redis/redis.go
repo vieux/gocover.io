@@ -22,11 +22,17 @@ func Dial(network, address string) (redis.Conn, error) {
 	return redis.Dial(network, address)
 }
 
-func NewPool(network, address string) (pool *redis.Pool, err error) {
+func NewPool(network, address, password string) (pool *redis.Pool, err error) {
 	pool = redis.NewPool(func() (redis.Conn, error) {
 		c, err := redis.Dial("tcp", address)
 		if err != nil {
 			return nil, err
+		}
+		if password != "" {
+			if _, err := c.Do("AUTH", password); err != nil {
+				c.Close()
+				return nil, err
+			}
 		}
 		return c, nil
 	}, REDIS_POOL_SIZE)
