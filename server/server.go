@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"html/template"
@@ -11,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	r "github.com/garyburd/redigo/redis"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
 
@@ -23,6 +25,75 @@ var (
 	redisAddr = flag.String("r", "127.0.0.1:6379", "redis address")
 	redisPass = flag.String("rp", "", "redis password")
 )
+
+func docker(repo, version string, pool *r.Pool) (int, string) {
+	var (
+		worker = "vieux/gocover"
+		conn   = pool.Get()
+	)
+
+	defer conn.Close()
+
+	if version != "" {
+		worker = worker + ":" + version
+	}
+
+	if version == "" {
+		if cached, fresh, err := redis.GetRepo(conn, repo); err != nil {
+			return 500, err.Error()
+		} else if fresh {
+			return 200, string(cached)
+		}
+	}
+
+	out, err := exec.Command("docker", "-H", "unix://"+*socket, "run", "--rm", "-a", "stdout", "-a", "stderr", worker, repo).CombinedOutput()
+	if err != nil {
+		if strings.Contains(string(out), "Unable to find image") {
+			return 500, "go version '" + version + "' not found"
+		}
+		return 500, string(out)
+	}
+	re, err := regexp.Compile("\\<script[\\S\\s]+?\\</script\\>")
+	if err != nil {
+		return 500, err.Error()
+	}
+	content := re.ReplaceAllString(string(out), "")
+	content = strings.Replace(content, "background: black;", "background: #222222;", 2)
+
+	content = strings.Replace(content, ".cov1 { color: rgb(128, 128, 128) }", ".cov1 { color: #52987D }", 2)
+	content = strings.Replace(content, ".cov2 { color: rgb(128, 128, 128) }", ".cov2 { color: #4BA180 }", 2)
+	content = strings.Replace(content, ".cov3 { color: rgb(128, 128, 128) }", ".cov3 { color: #44AA83 }", 2)
+	content = strings.Replace(content, ".cov4 { color: rgb(128, 128, 128) }", ".cov4 { color: #3DB487 }", 2)
+	content = strings.Replace(content, ".cov5 { color: rgb(128, 128, 128) }", ".cov5 { color: #36BD8A }", 2)
+	content = strings.Replace(content, ".cov6 { color: rgb(128, 128, 128) }", ".cov6 { color: #2FC68D }", 2)
+	content = strings.Replace(content, ".cov7 { color: rgb(128, 128, 128) }", ".cov7 { color: #28D091 }", 2)
+	content = strings.Replace(content, ".cov8 { color: rgb(128, 128, 128) }", ".cov8 { color: #21D994 }", 2)
+	content = strings.Replace(content, ".cov9 { color: rgb(128, 128, 128) }", ".cov9 { color: #1AE297 }", 2)
+
+	content = strings.Replace(content, "\">"+repo, "\">", -1)
+
+	re = regexp.MustCompile("-- cov:([0-9.]*) --")
+	matches := re.FindStringSubmatch(content)
+	if len(matches) == 2 {
+		cov, err := strconv.ParseFloat(matches[1], 64)
+		if err == nil {
+			content = strings.Replace(content, "<select id=", fmt.Sprintf("<span class='cov%d'>%s%%</span> | <select id=", int((cov-0.0001)/10), matches[1]), 1)
+		}
+		if version != "" {
+			content = strings.Replace(content, "<select id=", fmt.Sprintf("<span>%s</span> | <select id=", version), 1)
+		} else {
+			redis.SetCache(conn, repo, content, matches[1])
+		}
+	} else if version != "" {
+		content = strings.Replace(content, "<select id=", fmt.Sprintf("<span>%s</span> | <select id=", version), 1)
+	} else {
+		redis.SetCache(conn, repo, content, "-1")
+	}
+	if version == "" {
+		redis.SetStats(conn, repo)
+	}
+	return 200, content
+}
 
 func main() {
 	flag.Parse()
@@ -54,6 +125,22 @@ func main() {
 			log.Println(err.Error())
 		}
 		r.HTML(200, "cover", map[string]interface{}{"top": top, "last": last, "cover_active": "active"})
+	})
+	m.Post("/_webhook", func(req *http.Request) (int, string) {
+
+		github := struct {
+			Repository struct {
+				Full_Name string
+			}
+		}{}
+
+		if err := json.NewDecoder(req.Body).Decode(&github); err != nil {
+			return 500, err.Error()
+		}
+
+		go docker(github.Repository.Full_Name, "", pool)
+
+		return 202, github.Repository.Full_Name
 	})
 	m.Get("/_badge/**", func(params martini.Params, r render.Render) {
 		var (
@@ -93,73 +180,7 @@ func main() {
 		return 404, "No cached version of " + repo
 	})
 	m.Get("/_/**", func(req *http.Request, params martini.Params) (int, string) {
-		var (
-			repo    = params["_1"]
-			conn    = pool.Get()
-			worker  = "vieux/gocover"
-			version = req.FormValue("version")
-		)
-		defer conn.Close()
-
-		if version != "" {
-			worker = worker + ":" + version
-		}
-
-		if version == "" {
-			if cached, fresh, err := redis.GetRepo(conn, repo); err != nil {
-				return 500, err.Error()
-			} else if fresh {
-				return 200, string(cached)
-			}
-		}
-
-		out, err := exec.Command("docker", "-H", "unix://"+*socket, "run", "--rm", "-a", "stdout", "-a", "stderr", worker, repo).CombinedOutput()
-		if err != nil {
-			if strings.Contains(string(out), "Unable to find image") {
-				return 500, "go version '" + version + "' not found"
-			}
-			return 500, string(out)
-		}
-		re, err := regexp.Compile("\\<script[\\S\\s]+?\\</script\\>")
-		if err != nil {
-			return 500, err.Error()
-		}
-		content := re.ReplaceAllString(string(out), "")
-		content = strings.Replace(content, "background: black;", "background: #222222;", 2)
-
-		content = strings.Replace(content, ".cov1 { color: rgb(128, 128, 128) }", ".cov1 { color: #52987D }", 2)
-		content = strings.Replace(content, ".cov2 { color: rgb(128, 128, 128) }", ".cov2 { color: #4BA180 }", 2)
-		content = strings.Replace(content, ".cov3 { color: rgb(128, 128, 128) }", ".cov3 { color: #44AA83 }", 2)
-		content = strings.Replace(content, ".cov4 { color: rgb(128, 128, 128) }", ".cov4 { color: #3DB487 }", 2)
-		content = strings.Replace(content, ".cov5 { color: rgb(128, 128, 128) }", ".cov5 { color: #36BD8A }", 2)
-		content = strings.Replace(content, ".cov6 { color: rgb(128, 128, 128) }", ".cov6 { color: #2FC68D }", 2)
-		content = strings.Replace(content, ".cov7 { color: rgb(128, 128, 128) }", ".cov7 { color: #28D091 }", 2)
-		content = strings.Replace(content, ".cov8 { color: rgb(128, 128, 128) }", ".cov8 { color: #21D994 }", 2)
-		content = strings.Replace(content, ".cov9 { color: rgb(128, 128, 128) }", ".cov9 { color: #1AE297 }", 2)
-
-		content = strings.Replace(content, "\">"+repo, "\">", -1)
-
-		re = regexp.MustCompile("-- cov:([0-9.]*) --")
-		matches := re.FindStringSubmatch(content)
-		if len(matches) == 2 {
-			cov, err := strconv.ParseFloat(matches[1], 64)
-			if err == nil {
-				content = strings.Replace(content, "<select id=", fmt.Sprintf("<span class='cov%d'>%s%%</span> | <select id=", int((cov-0.0001)/10), matches[1]), 1)
-			}
-			if version != "" {
-				content = strings.Replace(content, "<select id=", fmt.Sprintf("<span>%s</span> | <select id=", version), 1)
-			} else {
-				redis.SetCache(conn, repo, content, matches[1])
-			}
-		} else if version != "" {
-			content = strings.Replace(content, "<select id=", fmt.Sprintf("<span>%s</span> | <select id=", version), 1)
-		} else {
-			redis.SetCache(conn, repo, content, "-1")
-		}
-		if version == "" {
-			redis.SetStats(conn, repo)
-		}
-		return 200, content
+		return docker(params["_1"], req.FormValue("version"), pool)
 	})
 	m.Get("/**", func(req *http.Request, params martini.Params, r render.Render) {
 		var (
