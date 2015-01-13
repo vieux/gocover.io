@@ -7,7 +7,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -21,6 +20,7 @@ import (
 )
 
 var (
+	host      = flag.String("H", "unix:///var/run/docker.sock", "Dockerd socket")
 	serveAddr = flag.String("p", ":8080", "Address and port to serve")
 	redisAddr = flag.String("r", "127.0.0.1:6379", "redis address")
 	redisPass = flag.String("rp", "", "redis password")
@@ -46,7 +46,7 @@ func docker(repo, version string, pool *r.Pool) (int, string) {
 		}
 	}
 
-	out, err := exec.Command("docker", "-H", os.Getenv("DOCKER_HOST"), "run", "--rm", "-a", "stdout", "-a", "stderr", worker, repo).CombinedOutput()
+	out, err := exec.Command("docker", "-H", *host, "run", "--rm", "-a", "stdout", "-a", "stderr", worker, repo).CombinedOutput()
 	if err != nil {
 		if strings.Contains(string(out), "Unable to find image") {
 			return 500, "go version '" + version + "' not found"

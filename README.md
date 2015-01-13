@@ -38,6 +38,6 @@ $(boot2docker shellinit)
 docker run -d -p 6379:6379 --name redis-master crosbymichael/redis
 
 cd server && go build
-./server -r=$(boot2docker ip 2>/dev/null):6379
+./server -r=$(boot2docker ip 2>/dev/null):6379 -H $DOCKER_HOST
 ```
 
