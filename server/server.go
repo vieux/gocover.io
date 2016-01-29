@@ -20,10 +20,11 @@ import (
 )
 
 var (
-	socket    = flag.String("s", "/var/run/docker.sock", "Dockerd socket")
-	serveAddr = flag.String("p", ":8080", "Address and port to serve")
-	redisAddr = flag.String("r", "127.0.0.1:6379", "redis address")
-	redisPass = flag.String("rp", "", "redis password")
+	docker_socket = flag.String("s", "/var/run/docker.sock", "Dockerd socket")
+	docker_addr   = flag.String("d", "127.0.0.1:2375", "Dockerd addr")
+	serveAddr     = flag.String("p", ":8080", "Address and port to serve")
+	redisAddr     = flag.String("r", "127.0.0.1:6379", "redis address")
+	redisPass     = flag.String("rp", "", "redis password")
 )
 
 func docker(repo, version string, pool *r.Pool) (int, string) {
@@ -46,7 +47,17 @@ func docker(repo, version string, pool *r.Pool) (int, string) {
 		}
 	}
 
-	out, err := exec.Command("docker", "-H", "unix://"+*socket, "run", "--rm", "-a", "stdout", "-a", "stderr", worker, repo).CombinedOutput()
+	host := ""
+
+	if *docker_socket != "" {
+		host = "unix://" + *docker_socket
+	} else if *docker_addr != "" {
+		host = "tcp://" + *docker_addr
+	} else {
+		return 500, "cannot connect to docker daemon"
+	}
+
+	out, err := exec.Command("docker", "-H", host, "run", "--rm", "-a", "stdout", "-a", "stderr", worker, repo).CombinedOutput()
 	if err != nil {
 		if strings.Contains(string(out), "Unable to find image") {
 			return 500, "go version '" + version + "' not found"
