@@ -20,8 +20,8 @@ import (
 )
 
 var (
-	docker_socket = flag.String("s", "/var/run/docker.sock", "Dockerd socket")
-	docker_addr   = flag.String("d", "127.0.0.1:2375", "Dockerd addr")
+	docker_socket = flag.String("s", "", "Dockerd socket (e.g., /var/run/docker.sock)")
+	docker_addr   = flag.String("d", "", "Dockerd addr (e.g., 127.0.0.1:2375)")
 	serveAddr     = flag.String("p", ":8080", "Address and port to serve")
 	redisAddr     = flag.String("r", "127.0.0.1:6379", "redis address")
 	redisPass     = flag.String("rp", "", "redis password")
