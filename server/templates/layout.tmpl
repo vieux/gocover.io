@@ -43,7 +43,8 @@
         <div class="collapse navbar-collapse">
 	  <ul class="nav navbar-nav navbar-right">
 	  {{if .repo }}
-            <li style="padding: 20px 0px 0px 0px">&nbsp;&nbsp;&nbsp;<a href="https://twitter.com/share" class="twitter-share-button" data-text='"{{.repo}}" code coverage:' data-hashtags="golang">Tweet</a><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script></li>
+            <li style="padding: 22px 16px 0px 6px">&nbsp;&nbsp;&nbsp;<a href="https://twitter.com/share" class="twitter-share-button" data-text='"{{.repo}}" code coverage:' data-hashtags="golang">Tweet</a><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script></li>
+	    <li><a href="https://godoc.org/{{.repo}}"><img src="https://godoc.org/{{.repo}}?status.svg" alt="GoDoc"></a></a>
 	  {{end}}
             <li><a href="http://status.gocover.io">Status</a></li>
             <li class="{{.about_active}}"><a href="/about">About</a></li>
