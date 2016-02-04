@@ -225,7 +225,7 @@ func main() {
 		go func() {
 			log.Println(http.ListenAndServe(*serveAddr, http.RedirectHandler("https://gocover.io", http.StatusMovedPermanently)))
 		}()
-		log.Fatal(http.ListenAndServeTLS(*serveSAddr, filepath.Join(*certPath, "cert.pem"), filepath.Join(*certPath, "privkey.pem"), m))
+		log.Fatal(http.ListenAndServeTLS(*serveSAddr, filepath.Join(*certPath, "fullchain.pem"), filepath.Join(*certPath, "privkey.pem"), m))
 	} else {
 		log.Fatal(http.ListenAndServe(*serveAddr, m))
 	}
