@@ -223,10 +223,14 @@ func main() {
 	})
 	if *certPath != "" {
 		go func() {
-			log.Println(http.ListenAndServe(*serveAddr, http.RedirectHandler("https://gocover.io", http.StatusMovedPermanently)))
+			log.Println(http.ListenAndServe(*serveAddr, http.HandlerFunc(redir)))
 		}()
 		log.Fatal(http.ListenAndServeTLS(*serveSAddr, filepath.Join(*certPath, "fullchain.pem"), filepath.Join(*certPath, "privkey.pem"), m))
 	} else {
 		log.Fatal(http.ListenAndServe(*serveAddr, m))
 	}
+}
+
+func redir(w http.ResponseWriter, req *http.Request) {
+	http.Redirect(w, req, "https://gocover.io"+req.RequestURI, http.StatusMovedPermanently)
 }
