@@ -22,3 +22,15 @@ body {
 .progress {
     height: 42px !important;
 }
+
+.badge.red {
+    background-color: lightcoral;
+}
+
+.badge.orange {
+    background-color: lightsalmon;
+}
+
+.badge.green {
+    background-color: seagreen;
+}

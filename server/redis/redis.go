@@ -2,6 +2,7 @@ package redis
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -78,6 +79,7 @@ func GetRepo(c redis.Conn, repo string) (string, bool, error) {
 type top struct {
 	Repo     string
 	Coverage string
+	Color    string
 }
 
 func Top(c redis.Conn, key string, count int) ([]top, error) {
@@ -94,7 +96,18 @@ func Top(c redis.Conn, key string, count int) ([]top, error) {
 		if len(parts) == 1 {
 			tops = append(tops, top{Repo: repo})
 		} else {
-			tops = append(tops, top{Repo: parts[0], Coverage: fmt.Sprintf("%s%%", parts[1])})
+			color := ""
+			if f, err := strconv.ParseFloat(parts[1], 64); err == nil {
+				if f >= 75 {
+					color = "green"
+				} else if f >= 25 {
+					color = "orange"
+				} else {
+					color = "red"
+				}
+			}
+
+			tops = append(tops, top{Repo: parts[0], Coverage: fmt.Sprintf("%s%%", parts[1]), Color: color})
 		}
 	}
 	return tops, err
