@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -23,8 +24,10 @@ var (
 	docker_socket = flag.String("s", "", "Dockerd socket (e.g., /var/run/docker.sock)")
 	docker_addr   = flag.String("d", "", "Dockerd addr (e.g., 127.0.0.1:2375)")
 	serveAddr     = flag.String("p", ":8080", "Address and port to serve")
+	serveSAddr    = flag.String("ps", ":80443", "Address and port to serve HTTPS")
 	redisAddr     = flag.String("r", "127.0.0.1:6379", "redis address")
 	redisPass     = flag.String("rp", "", "redis password")
+	certPath      = flag.String("tls", "", "cert path")
 )
 
 func docker(repo, version string, pool *r.Pool) (int, string) {
@@ -218,5 +221,12 @@ func main() {
 			r.HTML(200, "loading", contexts)
 		}
 	})
-	log.Fatal(http.ListenAndServe(*serveAddr, m))
+	if *certPath != "" {
+		go func() {
+			log.Println(http.ListenAndServe(*serveAddr, http.RedirectHandler("https://gocover.io", http.StatusMovedPermanently)))
+		}()
+		log.Fatal(http.ListenAndServeTLS(*serveSAddr, filepath.Join(*certPath, "cert.pem"), filepath.Join(*certPath, "privkey.pem"), m))
+	} else {
+		log.Fatal(http.ListenAndServe(*serveAddr, m))
+	}
 }
