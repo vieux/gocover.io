@@ -1,6 +1,6 @@
-FROM golang:1.5.3
+FROM golang:1.6
 
-RUN wget https://test.docker.com/builds/Linux/x86_64/docker-1.10.2 -O /usr/bin/docker
+RUN wget https://test.docker.com/builds/Linux/x86_64/docker-1.10.3 -O /usr/bin/docker
 RUN chmod +x /usr/bin/docker
 
 
