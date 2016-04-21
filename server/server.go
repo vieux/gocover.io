@@ -83,7 +83,7 @@ func docker(repo, version string, pool *r.Pool) (int, string) {
 	content = strings.Replace(content, ".cov7 { color: rgb(128, 128, 128) }", ".cov7 { color: #28D091 }", 2)
 	content = strings.Replace(content, ".cov8 { color: rgb(128, 128, 128) }", ".cov8 { color: #21D994 }", 2)
 	content = strings.Replace(content, ".cov9 { color: rgb(128, 128, 128) }", ".cov9 { color: #1AE297 }", 2)
-
+	content = strings.Replace(content, "<option value=\"file0\">", "<option value=\"file0\" select=\"selected\">", -1)
 	content = strings.Replace(content, "\">"+repo, "\">", -1)
 
 	re = regexp.MustCompile("-- cov:([0-9.]*) --")
