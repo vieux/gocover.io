@@ -166,13 +166,13 @@ func main() {
 		if coverage, err := redis.GetCoverage(conn, repo); err != nil {
 			r.Redirect(fmt.Sprintf("https://img.shields.io/badge/coverage-error-lightgrey.svg?style=flat"))
 		} else if coverage < 25.0 {
-			r.Redirect(fmt.Sprintf("https://img.shields.io/badge/coverage-%.1f%%-red.svg?style=flat", coverage))
+			r.Redirect(fmt.Sprintf("https://img.shields.io/badge/coverage-%.1f%%25-red.svg?style=flat", coverage))
 		} else if coverage < 50.0 {
-			r.Redirect(fmt.Sprintf("https://img.shields.io/badge/coverage-%.1f%%-orange.svg?style=flat", coverage))
+			r.Redirect(fmt.Sprintf("https://img.shields.io/badge/coverage-%.1f%%25-orange.svg?style=flat", coverage))
 		} else if coverage < 75.0 {
-			r.Redirect(fmt.Sprintf("https://img.shields.io/badge/coverage-%.1f%%-green.svg?style=flat", coverage))
+			r.Redirect(fmt.Sprintf("https://img.shields.io/badge/coverage-%.1f%%25-green.svg?style=flat", coverage))
 		} else {
-			r.Redirect(fmt.Sprintf("https://img.shields.io/badge/coverage-%.1f%%-brightgreen.svg?style=flat", coverage))
+			r.Redirect(fmt.Sprintf("https://img.shields.io/badge/coverage-%.1f%%25-brightgreen.svg?style=flat", coverage))
 		}
 
 	})
