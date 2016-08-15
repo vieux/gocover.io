@@ -1,0 +1,10 @@
+redis:
+  image: redis
+
+gocover:
+  build: ./server
+  links:
+    - redis:redis
+  command: -r redis:6379
+  ports:
+    - 8080:8080
