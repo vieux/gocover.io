@@ -1,7 +1,6 @@
-FROM golang:1.6
+FROM golang:1.7
 
-RUN wget https://test.docker.com/builds/Linux/x86_64/docker-1.10.3 -O /usr/bin/docker
-RUN chmod +x /usr/bin/docker
+RUN wget https://get.docker.com/builds/Linux/x86_64/docker-1.13.0.tgz ; tar -xvf docker-1.13.0.tgz ; cp docker/docker /usr/bin/docker ; rm -rf docker
 
 
 COPY . /go/src/github.com/vieux/gocover.io/server
