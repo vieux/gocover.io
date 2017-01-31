@@ -1,6 +1,7 @@
     <iframe id="frame" frameborder="0" src="data:text/html;charset=utf-8,{{.cache}}<script>
     var files = document.getElementById('files');
     var visible =  document.getElementById('file0');
+    visible.style.display = 'block';
     files.addEventListener('change', function onChange() {
     visible.style.display = 'none';
     visible =  document.getElementById(files.value);

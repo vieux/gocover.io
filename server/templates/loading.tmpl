@@ -41,6 +41,7 @@
 
 			 var files = frame.contentDocument.getElementById('files');
                 	 var visible = frame.contentDocument.getElementById('file0');
+			 visible.style.display = 'block';	
                 	 files.addEventListener('change', function onChange() {
 	                 visible.style.display = 'none';	
                     	 visible = frame.contentDocument.getElementById(files.value);
