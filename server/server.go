@@ -163,6 +163,7 @@ func main() {
 		)
 
 		defer conn.Close()
+		r.Header().Add("Cache-Control", "no-cache")
 		if coverage, err := redis.GetCoverage(conn, repo); err != nil {
 			r.Redirect(fmt.Sprintf("https://img.shields.io/badge/coverage-error-lightgrey.svg?style=flat"))
 		} else if coverage < 25.0 {
