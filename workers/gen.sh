@@ -1,5 +1,5 @@
-VERSIONS="1.6.4 1.7.5"
-LATEST="1.7.5"
+VERSIONS="1.8"
+LATEST="1.8"
 
 for version in $VERSIONS; do
     docker build --build-arg GO_VERSION=$version -t vieux/gocover:$version . 
