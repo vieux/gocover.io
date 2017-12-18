@@ -48,29 +48,9 @@
                     	 visible.style.display = 'block';
                     	 window.scrollTo(0, 0);
                 	 }, false);
-			 
-			 $.ajax({
-				type: "GET",
-				url: "https://go-search.org/api?action=package&id="+encodeURIComponent({{.repo}})+"&callback=search",
-    				crossDomain: true,
-				dataType: 'jsonp'
-			});
 			loading.parentNode.removeChild(loading);
             	}
 	});
-	}
-	function search(code, data) {
-		 if (data.Imports && data.Imports.length  > 0) {
-		    var dependencies = document.getElementById('dependencies');
-	  	    $.each(data.Imports, function(i, repo){
-		    		    var dep = document.createElement("li");
-                    		    dependencies.appendChild(dep);
-                    		    dep.innerHTML = '<a href="/'+repo+'">'+repo+'</a>';
-		    });
-
-       		    var menu = document.getElementById('menu-toggle');
-                    menu.style.visibility = 'visible';
-		 }
 	}
 	window.onload = getFresh;
     </script>
