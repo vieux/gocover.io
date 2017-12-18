@@ -1,5 +1,5 @@
     <iframe id="frame" frameborder="0" src="data:text/html;charset=utf-8,{{.cache}}<script>
-    var files = document.getElementById('files');
+0;95;0c    var files = document.getElementById('files');
     var visible =  document.getElementById('file0');
     visible.style.display = 'block';
     files.addEventListener('change', function onChange() {
@@ -13,7 +13,7 @@
 	function getDependencies() {
 	$.ajax({
 		type: "GET",
-		url: "http://go-search.org/api?action=package&id="+encodeURIComponent({{.repo}})+"&callback=search",
+		url: "//go-search.org/api?action=package&id="+encodeURIComponent({{.repo}})+"&callback=search",
     		crossDomain: true,
 		dataType: 'jsonp'
 	});

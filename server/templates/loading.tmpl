@@ -51,7 +51,7 @@
 			 
 			 $.ajax({
 				type: "GET",
-				url: "http://go-search.org/api?action=package&id="+encodeURIComponent({{.repo}})+"&callback=search",
+				url: "//go-search.org/api?action=package&id="+encodeURIComponent({{.repo}})+"&callback=search",
     				crossDomain: true,
 				dataType: 'jsonp'
 			});
