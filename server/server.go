@@ -165,6 +165,7 @@ func main() {
 
 		defer conn.Close()
 		r.Header().Add("Cache-Control", "no-store, no-cache, must-revalidate")
+		r.Header().Add("Surrogate-Control", "max-age=7200")
 		//time is rounded for security reasons
 		r.Header().Add("Last-Modified", time.Now().UTC().Format("Mon, 2 Jan 2006 15:04:00 GMT"))
 		if coverage, err := redis.GetCoverage(conn, repo); err != nil {
