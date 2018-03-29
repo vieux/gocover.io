@@ -91,9 +91,10 @@ func docker(repo, version string, pool *r.Pool) (int, string) {
 	matches := re.FindStringSubmatch(content)
 	if len(matches) == 2 {
 		cov, err := strconv.ParseFloat(matches[1], 64)
-		if err == nil {
-			content = strings.Replace(content, "<select id=", fmt.Sprintf("<span class='cov%d'>%s%%</span> | <select id=", int((cov-0.0001)/10), matches[1]), 1)
+		if err != nil {
+			return 500, err.Error()
 		}
+		content = strings.Replace(content, "<select id=", fmt.Sprintf("<span class='cov%d'>%s%%</span> | <select id=", int((cov-0.0001)/10), matches[1]), 1)
 		if version != "" {
 			content = strings.Replace(content, "<select id=", fmt.Sprintf("<span>%s</span> | <select id=", version), 1)
 		} else {
