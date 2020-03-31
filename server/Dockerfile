@@ -1,6 +1,6 @@
 FROM golang:1.8
 
-RUN wget https://get.docker.com/builds/Linux/x86_64/docker-1.13.1.tgz ; tar -xvf docker-1.13.1.tgz ; cp docker/docker /usr/bin/docker ; rm -rf docker
+RUN wget https://download.docker.com/linux/static/stable/x86_64/docker-19.03.8.tgz ; tar -xvf docker-19.03.8.tgz ; cp docker/docker /usr/bin/docker ; rm -rf docker
 
 
 COPY . /go/src/github.com/vieux/gocover.io/server

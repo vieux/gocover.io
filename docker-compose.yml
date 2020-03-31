@@ -1,10 +1,16 @@
-redis:
-  image: redis
+version: "2"
+services:
+  redis:
+    image: redis
+    container_name: gocover_redis
 
-gocover:
-  build: ./server
-  links:
-    - redis:redis
-  command: -r redis:6379
-  ports:
-    - 8080:8080
+  gocover:
+    build: ./server
+    container_name: gocover_server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - redis:redis
+    command: -r redis:6379 -s /var/run/docker.sock
+    ports:
+      - 8080:8080
