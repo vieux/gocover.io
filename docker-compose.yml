@@ -3,6 +3,7 @@ services:
   redis:
     image: redis
     container_name: gocover_redis
+    restart: unless-stopped
 
   gocover:
     build: ./server
@@ -14,3 +15,4 @@ services:
     command: -r redis:6379 -s /var/run/docker.sock
     ports:
       - 8080:8080
+    restart: unless-stopped
