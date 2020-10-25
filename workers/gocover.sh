@@ -31,4 +31,9 @@ fi
 # Get total coverage result from each function:
 number=$(go tool cover -func coverage.out | sed -E -n 's/^total:.*\s+([0-9\.]+)%$/\1/p')
 
+if [ $? -gt 0 ]; then
+    echo "Cannot get coverage result '$1'" >&2
+    exit 5
+fi
+
 echo "<!-- cov:$number -->"
