@@ -9,7 +9,7 @@ fi
 
 cd $1
 
-number=`go test -covermode=count -coverprofile=coverage.out | grep coverage | cut -d ' ' -f 2 | sed 's/%//g'`
+number=`go test -covermode=count -coverprofile=coverage.out ./... | grep coverage | cut -d ' ' -f 2 | sed 's/%//g'`
 
 if [ $? -gt 0 ]; then
     echo "Cannot test '$1'" >&2
