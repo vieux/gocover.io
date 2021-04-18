@@ -1,4 +1,4 @@
-VERSIONS="1.16.3 1.16.2 1.16.1 1.16 1.15.11"
+VERSIONS="1.16.3 1.15.11"
 LATEST="1.16.x"
 
 for version in $VERSIONS; do

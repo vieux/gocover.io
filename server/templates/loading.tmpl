@@ -35,20 +35,9 @@
  		       loading.parentNode.removeChild(loading);
       		},
 		success: function(data){
-                	 $('#frame').contents().find('body').html(data);
-			 var frame = document.getElementById('frame');
-			 frame.style.visibility="visible";
-
-			 var files = frame.contentDocument.getElementById('files');
-                	 var visible = frame.contentDocument.getElementById('file0');
-			 visible.style.display = 'block';	
-                	 files.addEventListener('change', function onChange() {
-	                 visible.style.display = 'none';	
-                    	 visible = frame.contentDocument.getElementById(files.value);
-                    	 visible.style.display = 'block';
-                    	 window.scrollTo(0, 0);
-                	 }, false);
-			loading.parentNode.removeChild(loading);
+			 document.getElementById('frame').contentWindow.document.write(data);
+			 document.getElementById('frame').style.visibility="visible";
+			 loading.parentNode.removeChild(loading);
             	}
 	});
 	}

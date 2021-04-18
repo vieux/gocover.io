@@ -68,12 +68,7 @@ func docker(repo, version string, pool *r.Pool) (int, string) {
 		}
 		return 500, string(out)
 	}
-	re, err := regexp.Compile("\\<script[\\S\\s]+?\\</script\\>")
-	if err != nil {
-		return 500, err.Error()
-	}
-	content := re.ReplaceAllString(string(out), "")
-	content = strings.Replace(content, "background: black;", "background: #222222;", 2)
+	content := strings.Replace(string(out), "background: black;", "background: #222222;", 2)
 
 	content = strings.Replace(content, ".cov1 { color: rgb(128, 128, 128) }", ".cov1 { color: #52987D }", 2)
 	content = strings.Replace(content, ".cov2 { color: rgb(128, 128, 128) }", ".cov2 { color: #4BA180 }", 2)
@@ -87,7 +82,7 @@ func docker(repo, version string, pool *r.Pool) (int, string) {
 	content = strings.Replace(content, "<option value=\"file0\">", "<option value=\"file0\" select=\"selected\">", -1)
 	content = strings.Replace(content, "\">"+repo, "\">", -1)
 
-	re = regexp.MustCompile("-- cov:([0-9.]*) --")
+	re := regexp.MustCompile("-- cov:([0-9.]*) --")
 	matches := re.FindStringSubmatch(content)
 	if len(matches) == 2 {
 		cov, err := strconv.ParseFloat(matches[1], 64)

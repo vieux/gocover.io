@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export GO111MODULE=off
+
 go get -d -t $1 2> /dev/null
 
 if [ $? -gt 0 ]; then
@@ -9,7 +11,7 @@ fi
 
 cd $1
 
-go test -covermode=count -coverprofile=coverage.out ./...
+go test -covermode=count -coverprofile=coverage.out ./... >/dev/null 2>&1
 
 if [ $? -gt 0 ]; then
     echo "Cannot test '$1'" >&2
