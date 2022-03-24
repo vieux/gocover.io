@@ -127,11 +127,11 @@ func main() {
 		conn := pool.Get()
 		defer conn.Close()
 
-		top, err := redis.Top(conn, "top", 4)
+		top, err := redis.Top(conn, "top", 8)
 		if err != nil {
 			log.Println(err.Error())
 		}
-		last, err := redis.Top(conn, "last", 4)
+		last, err := redis.Top(conn, "last", 8)
 		if err != nil {
 			log.Println(err.Error())
 		}
@@ -160,6 +160,7 @@ func main() {
 		)
 
 		defer conn.Close()
+		r.Header().Add("Content-Type", "image/svg+xml;charset=utf-8")
 		r.Header().Add("Cache-Control", "no-store, no-cache, must-revalidate")
 		r.Header().Add("Surrogate-Control", "max-age=7200")
 		//time is rounded for security reasons
@@ -177,7 +178,7 @@ func main() {
 		}
 
 	})
-	m.Get("/_cache/**", func(req *http.Request, params martini.Params) (int, string) {
+	m.Get("/_cache/**.svg", func(req *http.Request, params martini.Params) (int, string) {
 		var (
 			repo = params["_1"]
 			conn = pool.Get()
