@@ -34,3 +34,9 @@ body {
 .badge.green {
     background-color: seagreen;
 }
+
+div#banner {
+    background-color: darkorange;
+    height: 40px;
+    padding: 10px;
+}

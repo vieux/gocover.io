@@ -123,6 +123,9 @@ func main() {
 	m.Get("/about", func(r render.Render) {
 		r.HTML(200, "about", map[string]interface{}{"about_active": "active"})
 	})
+	m.Get("/goodbye", func(r render.Render) {
+		r.HTML(200, "goodbye", map[string]interface{}{"goodbye_active": "active"})
+	})
 	m.Get("/", func(r render.Render) {
 		conn := pool.Get()
 		defer conn.Close()
