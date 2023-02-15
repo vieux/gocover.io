@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="go cover as a service">
+    <meta name="author" content="Victor Vieux">
+
+    <meta property="og:image" content="./og.png" />
+
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    
+    <title>GoCover.io</title>
+
+    <!-- Bootstrap cerulean CSS -->
+    <link href="https://netdna.bootstrapcdn.com/bootswatch/3.1.1/darkly/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body style="padding-top: 60px;">
+    <div class="navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">GoCover.io</a>
+        </div>
+      </div>
+    </div>
+    <div class="container" style="padding: 40px">
+      <div class="row text-center"><img src="./logo.png"/></div>
+      <div class="row">
+        <h2>Shutting down...</h2>
+        <p>The GoCover project started in 2014 and shutdown in 2023. Sources can be found on <a href="https://github.com/vieux/gocover.io">GitHub</a>.</p>
+        <br/>
+        <h2>What was it?</h2>
+        <p><a href="https://gocover.io">GoCover.io</a> was a service that offered code coverage of any golang package.</p>
+        <br/>
+        <h2>How did it work?</h2>
+        <p>GoCover gathered code coverage by executing a package's tests within an isolated <a href="https://docker.io">Docker</a> container.</p>
+        <br/>
+        <h2>What's Next?</h2>
+        <p><a href="https://github.com/ncruces">@ncruces</a> released <b style="color: coral;">go-coverage-report</b>, a <a href="https://github.com/marketplace/actions/go-coverage-report">GitHub Action</a> that will generate goverage report on every commit and store it in Github (hidden in the your project's wiki).
+        <br/><br/>
+You add this to your CI pipeline (<i>after</i> tests are run):
+<br/></p>
+<pre>
+    - name: Update coverage report
+      uses: ncruces/go-coverage-report@main
+</pre>
+<p>Then the badge is applied to the `README.md` as such:</p>
+<pre>
+    [![Go Coverage](https://github.com/USER/REPO/wiki/coverage.svg)](https://raw.githack.com/wiki/USER/REPO/coverage.html)
+</pre>
+<br/>
+You can see it in action on: <a href="https://github.com/ncruces/julianday">https://github.com/ncruces/julianday</a>
+</p>
+	  
+      </div>
+    </div><!-- /.container -->
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+  </body>
+</html>
