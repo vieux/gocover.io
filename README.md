@@ -1,14 +1,35 @@
 [GoCover.io](http://gocover.io)
 ===============================
 
+Shutting down...
+----------------
+
+The GoCover project started in 2014 and shutdown in 2023.
+
+What was it?
+------------
+
+[GoCover.io](http://gocover.io) was a service that offered code coverage of any golang package.
+
+How did it work?
+----------------
+
+GoCover gathered code coverage by executing a package's tests within an isolated [Docker](http://docker.io) container.
+
+What's Next?
+------------
+
+[@ncruces](https://github.com/ncruces) released `go-coverage-report`, a [GitHub Action](https://github.com/marketplace/actions/go-coverage-report) that will generate goverage report on every commit and store it in Github (hidden in the your project's wiki).
 
 
-[GoCover.io](http://gocover.io)  is going away on February 15th 2023
+You add this to your CI pipeline (_after_ tests are run):
+```yaml
+    - name: Update coverage report
+      uses: ncruces/go-coverage-report@main
+```
 
-Dear valued users,
+Then the badge is applied to the `README.md` as such:
+```markdown
+[![Go Coverage](https://github.com/USER/REPO/wiki/coverage.svg)](https://raw.githack.com/wiki/USER/REPO/coverage.html)
 
-We regret to inform you that the gocover.io website, which has been in operation for 9 years, will be shutting down on February 15th. We have enjoyed providing our service to you over the years and are sorry for any inconvenience this may cause. Please note that all data and reports on the website will no longer be accessible after this date.
-
-We would like to take this opportunity to thank all of our users for their support and loyalty over the past 9 years. It has been an honor to serve the community.
-
-Thank you for your understanding and support.
+You can see it in action on: [`github.com/ncruces/julianday`](https://github.com/ncruces/julianday)
